@@ -83,12 +83,15 @@ class Billing extends Controller
 			}
 		}	
 	}
+
 	function left()
 	{
 		$data['poisk']=$this->session->userdata('poisk');
 		if ($this->session->userdata('poisk')==NULL) $data['poisk']='1';
 		$this->load->view("left",$data);
+		$this->load->view("messages");
 	}
+
 	function phpinfo()
 	{ 
 		echo phpinfo();
@@ -1023,7 +1026,7 @@ class Billing extends Controller
 		{
 			$tariff_value=$_POST['tariff_value'];
 			$tariff_kvt=$_POST['tariff'];
-			$buf;
+//			$buf;
 			for($j=0;$j<$_POST['tariff_count'];$j++)
 			{
 				if ($tariff_value[$j]>0)
@@ -2002,9 +2005,12 @@ class Billing extends Controller
 
 	function perehod()
 	{
-		$this->db->query("select industry.goto_next_period();");
-		redirect("billing");
+        $this->db->query("select industry.goto_next_period();");
+        $array = array(1 => 'Переход в следующий месяц прошел успешно!');
+        $this->session->set_flashdata('success', $array);
+        redirect("billing");
 	}
+
 	function oplata_delete()
 	{
 		$sql="delete from industry.oplata where id=".$this->uri->segment(3);
