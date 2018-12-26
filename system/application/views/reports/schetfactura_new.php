@@ -40,6 +40,9 @@ function datetostring2($date)
 }
 
 ?>
+<?php if (!isset($fine_value)) {
+    $fine_value = 0;
+} ?>
 <html>
 <head>
 <meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -213,6 +216,21 @@ foreach($s as $s2 ):
 	<TD width="100px">0</TD>
 </tr>
 <?php  endforeach;?>
+     <?php if ($fine_value > 0): ?>
+         <tr>
+             <td width="60px" class="border-td"><?php echo $i++; ?></td>
+             <td width="400px">Пеня</td>
+             <td width="100px">тенге</td>
+             <td width="200px"></td>
+             <td width="100px"></td>
+             <td width="300px"></td>
+             <td width="110px"></td>
+             <td width="250px"></td>
+             <td width="400px" align="right"><?php echo sprintf("%22.2f", $fine_value); ?></td>
+             <td width="110px" align="center">0</td>
+             <td width="100px" align="center">0</td>
+         </tr>
+     <?php endif; ?>
 <tr align="center">
 <td width="560px" colspan = "3" ><b align="left">Барлыгы шот бойынша<br/>Всего по счету:<></b></td>
 <td width="200px"><?php echo f_d($sum_kvt);?></td>
@@ -220,7 +238,7 @@ foreach($s as $s2 ):
 <td width="300px" align="right"><b><?php echo f_d($itog->itog_tenge);?></b></td>
 <td width="110px" bgColor=#c0c0c0></td>
 <td width="250px" align="right"><b><?php echo f_d($sumnds);?></b></td>
-<td width="400px" align="right"><b><?php echo f_d($sumitog);?></b></td>
+<td width="400px" align="right"><b><?php echo f_d($sumitog+$fine_value);?></b></td>
 <td width="110px" bgColor=#c0c0c0></td>
 <td width="100px"></td>
 </tr>
