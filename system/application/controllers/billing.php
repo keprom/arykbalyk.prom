@@ -429,7 +429,15 @@ class Billing extends Controller
 		$sql="select * from industry.counter where data_start is null  and  point_id=".$this->uri->segment(3);
 		$query=$this->db->query($sql);
 		$this->left();
-		
+
+        #ins_check
+        $bill_id = $this->uri->segment(3);
+        $this->db->order_by("data", "DESC");
+        $this->db->where("bill_id", $bill_id);
+        $this->db->limit(1);
+        $data['last_ins_check'] = $this->db->get("industry.billing_point_ins_check")->row();
+        #ins_check
+
 		if ($query->num_rows()>0) $data['snyat']='yes'; else $data['snyat']='false';
 		$this->load->view("counters_view",$data);
 		if ($data['snyat']=="false")
@@ -495,7 +503,8 @@ class Billing extends Controller
 	}
 	function changing_counter()
 	{
-		if ($_POST['data_gos_proverki']=='') $_POST['data_gos_proverki']=NULL;
+        if ($_POST['data_gos_proverki']=='') $_POST['data_gos_proverki']=NULL;
+        if ($_POST['digit_count']=='') $_POST['digit_count']=NULL;
 		$this->db->where('id',$this->uri->segment(3));
 		$this->db->update('industry.counter',$_POST);
 		redirect('billing/counter/'.$this->uri->segment(3));
@@ -1399,6 +1408,13 @@ class Billing extends Controller
 		if ($count==0)
 		{
 			$count=-1;
+
+            #ins_check
+            $bill_id = $this->uri->segment(3);
+            $this->db->where("bill_id", $bill_id);
+            $this->db->delete("industry.billing_point_ins_check");
+            ##ins_check
+
 			$sql="delete from industry.billing_point where id=".$this->uri->segment(3);
 			$this->db->query($sql);
 		}
@@ -3904,6 +3920,86 @@ where firm_id={$this->uri->segment(3)} and data_finish is null";
         header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
         $this->load->view($view_name, $data);
     }
+
+    #ins_check
+    public function add_ins_check()
+    {
+        if (empty($_POST['data']) or (empty($_POST['act_number']))) {
+            exit("Zapolnite polya!");
+        }
+
+        if (($_POST['data']) > date("Y-m-d")) {
+            exit("Necorrectnaya data!");
+        }
+
+        if (empty($_POST['notice'])) {
+            unset($_POST['notice']);
+        }
+
+        $this->db->insert("industry.billing_point_ins_check", $_POST);
+        redirect("billing/point/" . $_POST['bill_id']);
+    }
+
+    public function del_ins_check()
+    {
+        $this->db->where("id", $_POST['id']);
+        $this->db->delete("industry.billing_point_ins_check");
+        redirect("billing/point/" . $_POST['bill_id']);
+    }
+    #ins_check
+
+    #transformator
+    public function transformator()
+    {
+        $bill_id = $this->uri->segment(3);
+        $data['bill_id'] = $bill_id;
+
+        $this->db->where("bill_id", $bill_id);
+        $data['t'] = $this->db->get("industry.transformator")->row();
+
+        $this->left();
+        $this->load->view("transformator/index", $data);
+        $this->load->view("right");
+    }
+
+    public function add_transformator()
+    {
+        $bill_id = $_POST['bill_id'];
+        if (empty($_POST['data_gp'])) {
+            unset($_POST['data_gp']);
+        } elseif ($_POST['data_gp'] > date("Y-m-d")) {
+            exit("Necorrectnaya data!");
+        }
+        $this->db->insert("industry.transformator", $_POST);
+        redirect("billing/transformator/" . $bill_id);
+    }
+
+    public function edit_transformator()
+    {
+        $t_id = $_POST['id'];
+        unset($_POST['id']);
+
+        if ($_POST['data_gp'] > date("Y-m-d")) {
+            exit("Necorrectnaya data!");
+        }
+
+        $this->db->where("id", $t_id);
+        $this->db->update("industry.transformator", $_POST);
+
+        $this->db->where("id", $t_id);
+        $bill_id = $this->db->get("industry.transformator")->row()->bill_id;
+
+        redirect("billing/transformator/" . $bill_id);
+    }
+
+    public function delete_transformator()
+    {
+        $bill_id = $this->uri->segment(3);
+        $this->db->where("bill_id", $bill_id);
+        $this->db->delete("industry.transformator");
+        redirect("billing/point/" . $bill_id);
+    }
+    #transformator
 }
 
 ?>
