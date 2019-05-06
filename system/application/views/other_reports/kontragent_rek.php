@@ -16,6 +16,7 @@
         <th>№</th>
         <th>Договор</th>
         <th>Наименование организации</th>
+        <th>Адрес</th>
         <th>БИН</th>
         <th>Номер банковского счета</th>
         <th>Наименование банка</th>
@@ -28,6 +29,7 @@
             <td><?php echo $i++; ?></td>
             <td><?php echo $r->dogovor; ?></td>
             <td><?php echo $r->firm_name; ?></td>
+            <td><?php echo $r->address; ?></td>
             <td><?php echo $r->bin; ?></td>
             <td><?php echo $r->schet; ?></td>
             <td><?php echo $r->bank_name; ?></td>
